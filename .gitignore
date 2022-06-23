@@ -1,0 +1,8 @@
+/.idea/
+/venv
+/db.*
+/zerno_bot_api/__pycache__/
+/bot_api/migrations/__pycache__/
+/bot_api/__pycache__/
+/enviroment_config
+/this_app_in_heroku.txt
