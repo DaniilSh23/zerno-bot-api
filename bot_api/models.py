@@ -44,7 +44,7 @@ class Items(models.Model):
     image_for_items_id = models.TextField(max_length=2000, verbose_name='ID картинки для товара', null=True, blank=True)
 
     class Meta:
-        ordering = ['price']
+        ordering = ['items_name']
         db_table = 'Товары'
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'

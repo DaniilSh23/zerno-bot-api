@@ -1,7 +1,7 @@
 from django.urls import path
 
 from bot_api.views import CategoryView, ItemsListView, OrderBasketView, AddItemToBasket, RemoveItemToBasket, OrdersView, \
-    RemoveOrder, ClearBasket, ItemsDetailView, OrderArchiveView
+    RemoveOrder, ClearBasket, ItemsDetailView, OrderArchiveView, AddNewUserView
 
 urlpatterns = [
     path('categories/', CategoryView.as_view(), name='categories'),
@@ -14,4 +14,5 @@ urlpatterns = [
     path('clear_basket/', ClearBasket.as_view(), name='clear_basket'),
     path('item_detail/', ItemsDetailView.as_view(), name='item_detail'),
     path('order_archive/', OrderArchiveView.as_view(), name='order_archive'),
+    path('add_new_user/', AddNewUserView.as_view(), name='add_new_user'),
 ]

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from bot_api.models import Categories, Items, OrderBasket, Order, OrderArchive, BotUsers
 from bot_api.serializers import ItemsSerializer, CategoriesSerializer, OrderBasketSerializer, OrderSerializer, \
-    OrderArchiveSerializer
+    OrderArchiveSerializer, BotUsersSerializer
 
 
 # 1
@@ -274,3 +274,19 @@ class OrderArchiveView(APIView):
             Order.objects.get(pk=order_id).delete()
             return Response(status.HTTP_200_OK)
         return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class AddNewUserView(APIView):
+    '''Добавление нового пользователя в БД'''
+
+    def post(self, request, format=None):
+        serializer = BotUsersSerializer(data=request.data)
+        if serializer.is_valid():
+            user_tlg_id = serializer.data.get('user_tlg_id')
+            user_object = BotUsers.objects.update_or_create(
+                user_tlg_id=user_tlg_id,
+                defaults=serializer.data)
+            result_object = BotUsersSerializer(user_object[0]).data
+            return Response(result_object, status.HTTP_200_OK)
+        else:
+            Response(status.HTTP_400_BAD_REQUEST)
