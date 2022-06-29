@@ -5,10 +5,10 @@ class BotUsers(models.Model):
     '''Пользователи бота'''
 
     user_tlg_id = models.CharField(verbose_name='ID телеграма пользователя', max_length=50, db_index=True)
-    user_tlg_name = models.CharField(verbose_name='Никнейм в телеграме', max_length=100)
+    user_tlg_name = models.CharField(verbose_name='Никнейм в телеграме', max_length=100, blank=True, null=True)
     user_name = models.CharField(verbose_name='Имя клиента', max_length=100, blank=True, null=True)
     last_shipping_address = models.CharField(verbose_name='Адрес доставки', max_length=500, blank=True, null=True)
-    orders_numb = models.IntegerField(verbose_name='Количество заказов', default=0, blank=True, null=True)
+    orders_numb = models.IntegerField(verbose_name='Количество заказов', default=0, blank=True)
 
     class Meta:
         ordering = ['id']
@@ -17,7 +17,7 @@ class BotUsers(models.Model):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.user_tlg_name
+        return str(self.user_tlg_id)
 
 
 class Categories(models.Model):
@@ -72,15 +72,15 @@ class Order(models.Model):
 
     user = models.ForeignKey(to=BotUsers, verbose_name='Пользователь', on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время заказа')
-    pay_status = models.BooleanField(default=False, verbose_name='Статус оплаты', db_index=True, null=True, blank=True)
-    execution_status = models.BooleanField(default=False, verbose_name='Статус выполнения заказа', db_index=True,
-                                           null=True, blank=True)
-    order_items = models.TextField(max_length=4000, verbose_name='Товары из заказа')
-    result_orders_price = models.FloatField(verbose_name='Итоговая цена заказа')
+    pay_status = models.BooleanField(default=False, verbose_name='Статус оплаты', db_index=True, blank=True, null=True)
+    execution_status = models.BooleanField(default=False, verbose_name='Статус выполнения заказа',
+                                           db_index=True, blank=True, null=True)
+    order_items = models.TextField(max_length=10000, verbose_name='Товары из заказа', blank=True, null=True)
+    result_orders_price = models.FloatField(verbose_name='Итоговая цена заказа', blank=True, default=0)
     need_milling = models.BooleanField(verbose_name='Помол', default=False)
     shipping = models.BooleanField(verbose_name='Доставка', default=False)
     shipping_address = models.CharField(verbose_name='Адрес доставки', max_length=500, blank=True, null=True)
-    contact_telephone = models.CharField(verbose_name='Контактный телефон', max_length=20)
+    contact_telephone = models.CharField(verbose_name='Контактный телефон', max_length=30, blank=True, null=True)
 
     class Meta:
         ordering = ['-datetime']

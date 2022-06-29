@@ -167,32 +167,38 @@ class OrdersView(APIView):
     def post(self, request, format=None):
         orders_id = request.data.get('id')
         serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            # хз почему, но когда использовал данные из сериализатора ничего не выходило
-            user = BotUsers.objects.get(user_tlg_id=serializer.data.get('user'))
-            order_object = Order.objects.update_or_create(id=orders_id, defaults={
-                'user': user,
-                'pay_status': serializer.data.get('pay_status'),
-                'execution_status': serializer.data.get('execution_status'),
-                'order_items': serializer.data.get('order_items'),
-                'result_orders_price': serializer.data.get('result_orders_price'),
-                "need_milling": serializer.data.get('need_milling'),
-                "shipping": serializer.data.get('shipping'),
-                "shipping_address": serializer.data.get('shipping_address'),
-                "contact_telephone": serializer.data.get('contact_telephone'),
-            })
+        user = BotUsers.objects.get(user_tlg_id=request.data.get('user'))
+        order_object = Order.objects.update_or_create(id=orders_id, defaults={
+            'user': user,
+            'pay_status': request.data.get('pay_status'),
+            'execution_status': request.data.get('execution_status'),
+            'order_items': request.data.get('order_items'),
+            'result_orders_price': request.data.get('result_orders_price'),
+            "need_milling": request.data.get('need_milling'),
+            "shipping": request.data.get('shipping'),
+            "shipping_address": request.data.get('shipping_address'),
+            "contact_telephone": request.data.get('contact_telephone'),
+        })
 
-            result_object = OrderSerializer(order_object[0]).data
-            print(f'ОТДАЁМ БОТУ: {result_object}')
+            # "pay_status": false,
+            # "execution_status": true,
+            # "order_items": "проба",
+            # "result_orders_price": 111.0,
+            # "need_milling": true,
+            # "shipping": false,
+            # "shipping_address": "Болото Шрека 23",
+            # "contact_telephone": "+797877788823",
+            # "user": 1
 
-            # {'id': 2, 'datetime': '2022-06-23T14:33:59.135991Z', 'pay_status': False, 'execution_status': True,
-            # 'order_items': 'товары для Шрека', 'result_orders_price': 111.0, 'need_milling': True,
-            # 'shipping': False, 'shipping_address': 'Болото Шрека 23', 'contact_telephone': '+797877788823',
-            # 'user': 1}
+        result_object = OrderSerializer(order_object[0]).data
+        print(f'ОТДАЁМ БОТУ: {result_object}')
 
-            return Response(result_object, status.HTTP_200_OK)
-        print('SEND 400')
-        return Response(status.HTTP_400_BAD_REQUEST)
+        # {'id': 2, 'datetime': '2022-06-23T14:33:59.135991Z', 'pay_status': False, 'execution_status': True,
+        # 'order_items': 'товары для Шрека', 'result_orders_price': 111.0, 'need_milling': True,
+        # 'shipping': False, 'shipping_address': 'Болото Шрека 23', 'contact_telephone': '+797877788823',
+        # 'user': 1}
+
+        return Response(result_object, status.HTTP_200_OK)
 
 
 # 7
@@ -285,7 +291,13 @@ class AddNewUserView(APIView):
             user_tlg_id = serializer.data.get('user_tlg_id')
             user_object = BotUsers.objects.update_or_create(
                 user_tlg_id=user_tlg_id,
-                defaults=serializer.data)
+                defaults={
+                    'user_tlg_id': user_tlg_id,
+                    'user_tlg_name': serializer.data.get('user_tlg_name'),
+                    'user_name': serializer.data.get('user_name'),
+                    'last_shipping_address': serializer.data.get('last_shipping_address'),
+                })
+            user_object[0].orders_numb += 1
             result_object = BotUsersSerializer(user_object[0]).data
             return Response(result_object, status.HTTP_200_OK)
         else:
