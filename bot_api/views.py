@@ -162,6 +162,11 @@ class OrdersView(APIView):
             orders_serializer = OrderSerializer(order, many=False).data
             return Response(orders_serializer, status.HTTP_200_OK)
 
+        elif not user_tlg_id and not order_id:
+            orders = Order.objects.all()
+            orders_serializer = OrderSerializer(orders, many=True).data
+            return Response(orders_serializer, status.HTTP_200_OK)
+
         return Response(status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
@@ -207,6 +212,7 @@ class RemoveOrder(APIView):
 
     def get(self, request, format=None):
         order_id = request.query_params.get('id')
+        print(f'ORDER_ID_DELETE +++++ {order_id}')
         if order_id:
             Order.objects.get(id=order_id).delete()
             return Response(status.HTTP_200_OK)
@@ -264,7 +270,7 @@ class OrderArchiveView(APIView):
         serializer = OrderArchiveSerializer(data=request.data)
         if serializer.is_valid():
             order_id = serializer.data.get('order_id_before_receiving')
-            user = BotUsers.objects.get(user_tlg_id=serializer.data.get('user'))
+            user = BotUsers.objects.get(id=serializer.data.get('user'))
             OrderArchive.objects.create(
                 order_id_before_receiving=order_id,
                 user=user,
@@ -282,8 +288,14 @@ class OrderArchiveView(APIView):
         return Response(status.HTTP_400_BAD_REQUEST)
 
 
-class AddNewUserView(APIView):
+class UserView(APIView):
     '''Добавление нового пользователя в БД'''
+
+    def get(self, request, format=None):
+        user_id = request.query_params.get('user_id')
+        user_object = BotUsers.objects.get(id=user_id)
+        result_object = BotUsersSerializer(user_object, many=False).data
+        return Response(result_object, status.HTTP_200_OK)
 
     def post(self, request, format=None):
         serializer = BotUsersSerializer(data=request.data)
